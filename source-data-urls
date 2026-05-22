@@ -1,0 +1,68 @@
+# These can be re-downloaded by running `just dw-data`
+# This also serves to document where the data was found, and for data that was downloaded 
+# manually. to document from where and how.
+
+# Urls from https://spatialhub-mdb-sa.opendata.arcgis.com/search?collection=dataset
+
+# 2000
+url=https://www.arcgis.com/sharing/rest/content/items/7d0dbcaaabc0429a9e5a73a118f8ed99/data
+output=demarcations/2000/wards.gdb.zip
+
+# 2009
+url=https://www.arcgis.com/sharing/rest/content/items/29f81c485ed8475fb355d38886606950/data
+output=demarcations/2009/local.gdb.zip
+
+url=https://www.arcgis.com/sharing/rest/content/items/de335c384e694439be60ae14e97d169e/data
+output=demarcations/2009/district.gdb.zip
+
+url=https://www.arcgis.com/sharing/rest/content/items/288ee4295594482cb0d31ae35a8ab1d4/data
+output=demarcations/2009/wards.gdb.zip
+
+# 2011
+url=https://www.arcgis.com/sharing/rest/content/items/8466ca680a3e4f35b69dddca4f11e357/data
+output=demarcations/2011/local.gdb.zip
+
+url=https://www.arcgis.com/sharing/rest/content/items/c34ba1c16a9d4797a32ca4e7755f5ded/data
+output=demarcations/2011/district.gdb.zip
+
+url=https://www.arcgis.com/sharing/rest/content/items/12d2deb98816451ab7c4dc09cdfeee6b/data
+output=demarcations/2011/wards.gdb.zip
+
+# 2016
+url=https://www.arcgis.com/sharing/rest/content/items/215cfd521e64452d8edeff1d83b89c76/data
+output=demarcations/2016/local.gdb.zip
+
+url=https://www.arcgis.com/sharing/rest/content/items/a763e1fc5a5c4d07bd7b527355bca971/data
+output=demarcations/2016/district.gdb.zip
+
+url=https://www.arcgis.com/sharing/rest/content/items/cfddb54aab5f4d62b2144d80d49b3fdb/data
+output=demarcations/2016/wards.gdb.zip
+
+# 2018
+url=https://www.arcgis.com/sharing/rest/content/items/b415f05c9d0648bfa2b042aa799059ad/data
+output=demarcations/2018/local.gdb.zip
+
+url=https://www.arcgis.com/sharing/rest/content/items/aaba805ffd254cb7bdf985db8eb7e37f/data
+output=demarcations/2018/district.gdb.zip
+
+# 2020
+url=https://www.arcgis.com/sharing/rest/content/items/e0223a825ea2481fa72220ad3204276b/data
+output=demarcations/2020/wards.gdb.zip
+
+# 2026 Manually downloaded https://geodatadownloader.com/maps/create
+# Get layers from https://www.arcgis.com/home/item.html?id=6d7488a7f83645218e547d403871e1e0
+
+# The following files are from
+# https://github.com/j-norwood-young/SA-Maps/tree/master/Voting%20Districts
+# demarcations/2000/all.shapefile.zip
+# demarcations/2009/all.shapefile.zip
+# demarcations/2011/all.shapefile.zip
+# demarcations/2016/all.shapefile.zip
+# demarcations/2004/all.shapefile.zip
+# demarcations/2006/all.shapefile.zip
+# demarcations/2014/all.shapefile.zip
+# demarcations/2019/all.shapefile.zip
+# demarcations/2021/voting-district.shapefile.zip
+# demarcations/2024/voting-district.shapefile.zip
+
+
