@@ -2,11 +2,12 @@
   "name": "elections-web",
   "private": true,
   "devDependencies": {
+    "prettier": "^3.8.3",
     "sirv": "^3.0.2",
-    "vite": "^8.0.12",
-    "prettier": "^3.8.3"
+    "vite": "^8.0.12"
   },
   "dependencies": {
+    "@fontsource/roboto": "^5.2.10",
     "@maicol07/material-web-additions": "^1.8.0",
     "@material-design-icons/svg": "^0.14.15",
     "@material/web": "^2.4.1",

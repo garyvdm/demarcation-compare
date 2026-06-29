@@ -1,3 +1,7 @@
+import "@fontsource/roboto/300.css"; // Light weight
+import "@fontsource/roboto/400.css"; // Regular weight
+import "@fontsource/roboto/700.css"; // Bold weight
+
 import "@material/web/all.js";
 import type { Select } from "@material/web/select/internal/select";
 
@@ -73,6 +77,7 @@ fromFetch("/data/elections.json")
           )
           .join(""),
       );
+      console.log(election_select.isUpdatePending);
       console.log(election_select.value);
       election_select.selectIndex(0);
       console.log(election_select.value);
