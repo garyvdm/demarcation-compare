@@ -1,4 +1,7 @@
 setup: process-setup web-setup
+format: web-format
+check: web-check
+
 
 [working-directory: 'web']
 web-setup:
@@ -11,6 +14,15 @@ web-serve:
 [working-directory: 'web']
 web-build:
     npx vite build
+
+[working-directory: 'web']
+web-format:
+    npx prettier --write .
+
+[working-directory: 'web']
+web-check:
+    npx prettier --check .
+
 
 process-setup:
     uv sync

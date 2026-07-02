@@ -1,6 +1,6 @@
-import { defineConfig } from "vite";
 import path from "path";
 import sirv from "sirv";
+import { defineConfig } from "vite";
 
 export default defineConfig({
   build: { sourcemap: true },
@@ -21,9 +21,7 @@ export default defineConfig({
           etag: true,
         });
 
-        server.middlewares.use("/data", (req, res, next) =>
-          data_sirv(req, res, null),
-        );
+        server.middlewares.use("/data", (req, res, next) => data_sirv(req, res, null));
       },
     },
   ],

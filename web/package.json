@@ -2,16 +2,33 @@
   "name": "elections-web",
   "private": true,
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "prettier": "^3.8.3",
     "sirv": "^3.0.2",
     "vite": "^8.0.12"
   },
   "dependencies": {
     "@fontsource/roboto": "^5.2.10",
-    "@maicol07/material-web-additions": "^1.8.0",
-    "@material-design-icons/svg": "^0.14.15",
-    "@material/web": "^2.4.1",
+    "@mdui/icons": "^1.0.3",
+    "lit-html": "^3.3.3",
     "maplibre-gl": "^5.24.0",
+    "mdui": "^2.1.4",
     "rxjs": "^7.8.2"
+  },
+  "prettier": {
+    "plugins": [
+      "@trivago/prettier-plugin-sort-imports"
+    ],
+    "importOrder": [
+      "^@fontsource",
+      "^@?mdui",
+      "^maplibregl",
+      "^lit-html",
+      "^rxjs",
+      "<THIRD_PARTY_MODULES>",
+      "^[./]"
+    ],
+    "importOrderSeparation": true,
+    "importOrderSortSpecifiers": false
   }
 }

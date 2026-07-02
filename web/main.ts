@@ -1,100 +1,145 @@
-import "@fontsource/roboto/300.css"; // Light weight
-import "@fontsource/roboto/400.css"; // Regular weight
-import "@fontsource/roboto/700.css"; // Bold weight
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/700.css";
 
-import "@material/web/all.js";
-import type { Select } from "@material/web/select/internal/select";
+import "@mdui/icons/menu.js";
+import "mdui";
+import { type List } from "mdui/components/list.js";
+import { type NavigationDrawer } from "mdui/components/navigation-drawer.js";
+import { setColorScheme } from "mdui/functions/setColorScheme.js";
+import "mdui/mdui.css";
 
-import "@maicol07/material-web-additions/top-app-bar/small-top-app-bar.js";
-import "@maicol07/material-web-additions/top-app-bar/medium-top-app-bar.js";
-import "@maicol07/material-web-additions/top-app-bar/large-top-app-bar.js";
+import { html, render } from "lit-html";
 
-import menu_svg from "@material-design-icons/svg/round/menu.svg?raw";
+import { BehaviorSubject, asyncScheduler, combineLatest, concat, of, switchMap } from "rxjs";
+import { fromFetch } from "rxjs/fetch";
 
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { fromFetch } from "rxjs/fetch";
-import { switchMap } from "rxjs/internal/operators/switchMap";
-
-import "./style.css";
 import type { Elections } from "./elections";
-import type { MdOutlinedSelect } from "@material/web/all.js";
+import "./style.css";
 
-// <md-filled-tonal-button id="election_select_button">
-//   <md-icon>${menu_svg}</md-icon>
-// </md-filled-tonal-button>
+setColorScheme("#007A4D"); // Green from SA Flag
 
-document.body.innerHTML = /* HTML */ `
-  <div style="display: flex; flex-direction: column; height: 100vh;">
-    <md-small-top-app-bar style="box-sizing: border-box;">
-      <div slot="start">
-        <md-circular-progress indeterminate id="elections-progress"></md-circular-progress>
-        <md-outlined-select
-          id="election_select"
-          style="display: none;"
-          label="Select Election"
-          style="padding:4px;"
-        ></md-outlined-select>
-      </div>
-      <div id="title">South African Demarcations Comparison</div>
-    </md-small-top-app-bar>
-    <div id="map" style="height: 100%"></div>
-  </div>
+render(
+  html`
+    <mdui-layout class="mdui-theme-auto" style="height: 100vh;">
+      <mdui-top-app-bar variant="center-aligned" scrolling>
+        <mdui-button-icon id="nav_bar_open"><mdui-icon-menu></mdui-icon-menu></mdui-button-icon>
+        <mdui-top-app-bar-title id="title">South African Demarcations Comparison</mdui-top-app-bar-title>
+        <div style="flex-grow: 1"></div>
+      </mdui-top-app-bar>
+      <mdui-navigation-drawer id="nav_bar" open>
+        <mdui-list id="nav_list"></mdui-list>
+      </mdui-navigation-drawer>
+      <mdui-layout-main class="immediate">
+        <div id="map" style="height: 100%;"></div>
+      </mdui-layout-main>
+    </mdui-layout>
+  `,
+  document.body,
+);
+
+const title_element = document.getElementById("title")!;
+const nav_bar = document.getElementById("nav_bar")! as NavigationDrawer;
+const nav_list = document.getElementById("nav_list")! as List;
+
+document.getElementById("nav_bar_open")?.addEventListener("click", () => {
+  nav_bar.open = !nav_bar.open;
+});
+
+class SelectedElection {
+  constructor(
+    public election: string | null,
+    public sub_election: string | null,
+  ) {}
+}
+
+const selected_election = new BehaviorSubject<SelectedElection>(new SelectedElection(null, null));
+
+const url_changed = () => {
+  const items = window.location.pathname.split("/").filter((item) => item != "");
+  const get_item = (i: number) => (items.length > i ? items[i] : null);
+  selected_election.next(new SelectedElection(get_item(0), get_item(1)));
+};
+
+window.addEventListener("popstate", url_changed);
+
+document.addEventListener("click", (e) => {
+  const target = e.target! as Element;
+  if (target.matches("[router-link]")) {
+    e.preventDefault();
+    history.pushState(null, "", target.getAttribute("href"));
+    url_changed();
+  }
+});
+
+const nav_list_template = (elections: Elections, selected_election: SelectedElection) => html`
+  <mdui-list-subheader>Elections</mdui-list-subheader>
+  <mdui-collapse accordion value="${selected_election.election}">
+    ${elections.toReversed().map(
+      (election) =>
+        html`<mdui-collapse-item value="${election.slug}">
+          <mdui-list-item
+            slot="header"
+            active="${selected_election.election == election.slug && selected_election.sub_election == null}"
+            href="/${election.slug}"
+            router-link
+          >
+            ${election.title}
+          </mdui-list-item>
+          ${election.sub_elections?.map(
+            (sub_election) =>
+              html`<mdui-list-item
+                style="margin-left: 2.5rem"
+                href="/${election.slug}/${sub_election.slug}"
+                id="${election.slug}-/${sub_election.slug}"
+                router-link
+                active="${selected_election.election == election.slug &&
+                selected_election.sub_election == sub_election.slug}"
+              >
+                ${sub_election.title}
+              </mdui-list-item>`,
+          )}
+        </mdui-collapse-item>`,
+    )}
+  </mdui-collapse>
 `;
 
-const app_bar = document.getElementsByTagName("md-small-top-app-bar").item(0)!;
-const title_element = document.getElementById("title")!;
-const election_select: Select = document.getElementById("election_select")!;
-
-fromFetch("/data/elections.json")
-  .pipe(
+const elections = concat(
+  of([] as Elections),
+  fromFetch("/data/elections.json").pipe(
     switchMap((response) => {
       if (response.ok) {
-        return response.json();
+        return response.json() as Promise<Elections>;
       }
       throw response;
     }),
-  )
-  .subscribe({
-    next: (elections: Elections) => {
-      document.getElementById("elections-progress")!.remove();
-      election_select.style.display = "";
-      election_select.insertAdjacentHTML(
-        "afterbegin",
-        elections
-          .toReversed()
-          .map((election, election_i) =>
-            election.sub_elections
-              ?.map(
-                (sub_election, sub_election_i) => /* HTML */ `
-                  <md-select-option value="${election.slug}-${sub_election.slug}">
-                    <div slot="headline">${election.title} ${sub_election.title}</div>
-                  </md-select-option>
-                `,
-              )
-              .join(""),
-          )
-          .join(""),
-      );
-      console.log(election_select.isUpdatePending);
-      console.log(election_select.value);
-      election_select.selectIndex(0);
-      console.log(election_select.value);
-    },
-  });
+  ),
+  asyncScheduler,
+);
 
-// const map = new maplibregl.Map({
-//   container: "map",
-//   style:
-//     "https://api.maptiler.com/maps/dataviz-v4-dark/style.json?key=OjztegVoPzci6MXQZwdR",
-//   bounds: [
-//     [16.45, -34.83],
-//     [32.89, -22.12],
-//   ],
-//   fitBoundsOptions: { padding: 20 },
-//   attributionControl: false,
-// });
+url_changed();
+
+combineLatest([elections, selected_election]).subscribe(([elections, selected_election]) => {
+  render(nav_list_template(elections, selected_election), nav_list);
+});
+
+var map: maplibregl.Map;
+
+setTimeout(() => {
+  let map = new maplibregl.Map({
+    container: "map",
+    style: "https://api.maptiler.com/maps/dataviz-v4-dark/style.json?key=OjztegVoPzci6MXQZwdR",
+    bounds: [
+      [16.45, -34.83],
+      [32.89, -22.12],
+    ],
+    fitBoundsOptions: { padding: 20 },
+    attributionControl: false,
+  });
+}, 1);
 
 // map.on("load", () => {
 //   // Add a source for the state polygons.
